@@ -28,8 +28,11 @@ function preload() {
     });
 }
 
-var bird;
+let isGameStarted = false;
 let hasLanded = false;
+let hasBumped = false;
+let cursors;
+var bird;
 
 function create() {
     const background = this.add.image(0, 0, "background").setOrigin(0, 0);
@@ -54,6 +57,45 @@ function create() {
 
     this.physics.add.overlap(bird, road, () => (hasLanded = true), null, this);
     this.physics.add.collider(bird, road);
+    this.physics.add.overlap(
+        bird,
+        topColumns,
+        () => (hasBumped = true),
+        null,
+        this
+    );
+    this.physics.add.overlap(
+        bird,
+        bottomColumns,
+        () => (hasBumped = true),
+        null,
+        this
+    );
+    this.physics.add.collider(bird, topColumns);
+    this.physics.add.collider(bird, bottomColumns);
+    cursors = this.input.keyboard.createCursorKeys();
+
+    
+
 }
 
-function update() {}
+function update() {
+  if (!isGameStarted) {
+      bird.setVelocityY(-160);
+  }
+  if (cursors.space.isDown && !isGameStarted) {
+      isGameStarted = true;
+  }
+  if (cursors.up.isDown && !hasLanded && !hasBumped) {
+      bird.setVelocityY(-160);
+  }
+
+  if (!hasLanded || !hasBumped) {
+      bird.body.velocity.x = 50;
+  }
+
+  if (hasLanded || hasBumped || !isGameStarted) {
+      bird.body.velocity.x = 0;
+  }
+}
+
